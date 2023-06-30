@@ -12,6 +12,11 @@ import com.github.ocraft.s2client.protocol.data.Units;
 import com.github.ocraft.s2client.protocol.game.PlayerInfo;
 import com.github.ocraft.s2client.protocol.game.PlayerType;
 import com.github.ocraft.s2client.protocol.unit.Unit;
+import com.sun.jna.platform.win32.BaseTSD;
+import com.sun.jna.platform.win32.User32;
+import com.sun.jna.platform.win32.WinDef;
+import com.sun.jna.platform.win32.WinUser;
+import com.sun.jna.platform.win32.WinUser.INPUT;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -30,8 +35,8 @@ public class TestReplayAutoObserver {
     private static String player1_name;
     private static String player2_name;
     private static String map_name;
-
     private static Map<Integer, String> replay_map = new LinkedHashMap<>();
+
 
     private static class SimpleObserver extends S2ReplayObserver {
         private CameraModuleObserver observer;
@@ -45,8 +50,26 @@ public class TestReplayAutoObserver {
 
         private int nbReplay;
 
+        // Virtual key code for the desired key
+        int virtualKeyCode = 0x44; // 'D' key
+
         public SimpleObserver() {
             observer = new CameraModuleObserver(this);
+        }
+
+        public static void pressKey(int c) {
+            INPUT input = new INPUT();
+            input.type = new WinDef.DWORD(INPUT.INPUT_KEYBOARD);
+            input.input.setType("ki");
+            input.input.ki.wScan = new WinDef.WORD(0);
+            input.input.ki.time = new WinDef.DWORD(0);
+            input.input.ki.dwExtraInfo = new BaseTSD.ULONG_PTR(0);
+            input.input.ki.wVk = new WinDef.WORD(c);
+            input.input.ki.dwFlags = new WinDef.DWORD(WinUser.WM_KEYDOWN);
+            User32.INSTANCE.SendInput(new WinDef.DWORD(1), (INPUT[]) input.toArray(1), input.size());
+            input.input.ki.wVk = new WinDef.WORD(c);
+            input.input.ki.dwFlags = new WinDef.DWORD(WinUser.KEYBDINPUT.KEYEVENTF_KEYUP);
+            User32.INSTANCE.SendInput(new WinDef.DWORD(1), (INPUT[]) input.toArray(1), input.size());
         }
 
         @Override
@@ -54,6 +77,18 @@ public class TestReplayAutoObserver {
             nbReplay++;
             observer.onStart();
             startTime = observation().getGameInfo().getNanoTime();
+            // Find the target window by its title
+            WinDef.HWND hwnd = User32.INSTANCE.FindWindow(null, "StarCraft II");
+            if (hwnd == null) {
+                System.out.println("Window not found");
+                return;
+            }
+
+            // Set the target window as the foreground window
+            User32.INSTANCE.SetForegroundWindow(hwnd);
+
+            // Simulate key press
+            pressKey(virtualKeyCode);
         }
 
         @Override
