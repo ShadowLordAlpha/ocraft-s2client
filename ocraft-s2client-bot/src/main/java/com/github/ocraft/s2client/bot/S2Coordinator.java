@@ -687,7 +687,7 @@ public class S2Coordinator {
         log.trace("s2Coordinator - update() observer start");
         if (!replayObservers.isEmpty()) {
             if (processSettings.getRealtime()) {
-                log.trace("s2Coordinator - update() reailtime");
+                log.trace("s2Coordinator - update() realtime");
                 stepReplayObserversRealtime();
             } else {
                 log.trace("s2Coordinator - update() step");
@@ -933,10 +933,13 @@ public class S2Coordinator {
     }
 
     private void stepReplayObserversRealtime() {
+        log.trace("s2Coordinator - stepReplayObserversRealtime() start");
         // Run all replay observers.
         if (replayObservers.size() == 1) {
+            log.trace("s2Coordinator - stepReplayObserversRealtime() size 1");
             runReplayRealtime().accept(replayObservers.get(0));
         } else {
+            log.trace("s2Coordinator - stepReplayObserversRealtime() multi size...");
             // Run all steps in parallel.
             replayObservers.parallelStream().forEach(runReplayRealtime());
         }
@@ -946,35 +949,43 @@ public class S2Coordinator {
                     .filter(replayObserver -> replayObserver.control().getAppState().equals(AppState.NORMAL))
                     .forEach(replayObserver -> replayObserver.control().issueEvents(Collections.emptyList()));
         }
+        log.trace("s2Coordinator - stepReplayObserversRealtime() end");
     }
 
     private Consumer<S2ReplayObserver> runReplayRealtime() {
         return replayObserver -> {
+            log.trace("s2Coordinator - runReplayRealtime() start");
             if (!replayObserver.control().getAppState().equals(AppState.NORMAL)) return;
 
             // If the replay is loading wait for it to finish loading before performing a step.
             if (replayObserver.control().hasResponsePending(ResponseType.START_REPLAY)) {
+                log.trace("s2Coordinator - runReplayRealtime() START_REPLAY");
                 // Don't consume a response if there isn't one in the queue.
                 if (replayObservers.size() > 1 && !replayObserver.control().pollResponse(ResponseType.START_REPLAY)) {
+                    log.trace("s2Coordinator - runReplayRealtime() returning");
                     return;
                 }
                 replayObserver.replayControl()
                         .waitForReplay(replayObserver.control().getResponsePending(ResponseType.START_REPLAY));
             }
 
+            log.trace("s2Coordinator - runReplayRealtime() inGame stuff {}", replayObserver.control().isInGame());
             if (replayObserver.control().isInGame()) {
                 replayObserver.control().getObservation();
 
                 // If multithreaded run everyone's OnStep in parallel.
                 if (processSettings.getMultithreaded()) {
+                    log.trace("s2Coordinator - runReplayRealtime() issuing Events");
                     replayObserver.control().issueEvents(Collections.emptyList());
                 }
 
                 if (!replayObserver.control().isInGame()) {
+                    log.trace("s2Coordinator - runReplayRealtime() Game Done...");
                     replayObserver.onGameEnd();
                 }
 
             }
+            log.trace("s2Coordinator - runReplayRealtime() done");
         };
     }
 
