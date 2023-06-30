@@ -947,7 +947,10 @@ public class S2Coordinator {
         if (!processSettings.getMultithreaded()) {
             replayObservers.stream()
                     .filter(replayObserver -> replayObserver.control().getAppState().equals(AppState.NORMAL))
-                    .forEach(replayObserver -> replayObserver.control().issueEvents(Collections.emptyList()));
+                    .forEach(replayObserver -> {
+                        replayObserver.control().issueEvents(Collections.emptyList());
+                        replayObserver.observerAction().sendActions();
+                    });
         }
         log.trace("s2Coordinator - stepReplayObserversRealtime() end");
     }
@@ -975,8 +978,9 @@ public class S2Coordinator {
 
                 // If multithreaded run everyone's OnStep in parallel.
                 if (processSettings.getMultithreaded()) {
-                    log.trace("s2Coordinator - runReplayRealtime() issuing Events");
+                    log.trace("s2Coordinator - runReplayRealtime() issuing Events 2");
                     replayObserver.control().issueEvents(Collections.emptyList());
+                    replayObserver.observerAction().sendActions();
                 }
 
                 if (!replayObserver.control().isInGame()) {
