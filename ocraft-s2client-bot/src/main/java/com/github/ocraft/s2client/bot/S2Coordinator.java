@@ -974,6 +974,8 @@ public class S2Coordinator {
 
             log.trace("s2Coordinator - runReplayRealtime() inGame stuff {}", replayObserver.control().isInGame());
             if (replayObserver.control().isInGame()) {
+                replayObserver.control().waitStep(replayObserver.control().step(processSettings.getStepSize()));
+                
                 replayObserver.control().getObservation();
 
                 // If multithreaded run everyone's OnStep in parallel.
