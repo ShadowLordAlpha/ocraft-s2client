@@ -282,6 +282,25 @@ public class TestReplayAutoObserver {
 
     }
 
+    private static void executeCommand(String command, String filePath) {
+        try {
+            ProcessBuilder processBuilder = new ProcessBuilder(command, filePath);
+            Process process = processBuilder.start();
+
+            // Wait for the process to finish
+            int exitCode = process.waitFor();
+
+            // Check the exit code to determine if the command executed successfully
+            if (exitCode == 0) {
+                System.out.println("Command executed successfully: " + command);
+            } else {
+                System.out.println("Command failed: " + command);
+            }
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void main(String... args) throws IOException {
 
         S2ReplayObserver observer = new SimpleObserver();
@@ -294,6 +313,7 @@ public class TestReplayAutoObserver {
             for (int i = totalFiles - 1; i >= 0; i--) {
                 File file = files[i];
                 String fileName = file.getName();
+                executeCommand("D:\\Workspace\\python\\commentary-sc2\\ReplayChatRemove.exe", "C:\\Users\\kille\\Downloads\\replays\\" + fileName);
                 int fileNumber = totalFiles - i; // Adjust the file number calculation if needed
                 replay_map.put(fileNumber, fileName);
             }
