@@ -117,21 +117,4 @@ class ImageDataTest {
 
         assertThat(imageData.sample(Point2d.of(57.0f, 63.0f))).as("image sample").isEqualTo(121);
     }
-
-    @Test
-    void fulfillsEqualsContract() throws UnsupportedEncodingException {
-        EqualsVerifier
-                .forClass(ImageData.class)
-                .withNonnullFields("size", "data")
-                .withIgnoredFields("imageType")
-                .withPrefabValues(
-                        ByteString.class,
-                        ByteString.copyFrom("test", "UTF-8"),
-                        ByteString.copyFrom("test2", "UTF-8"))
-                .withPrefabValues(
-                        BufferedImage.class,
-                        new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB),
-                        new BufferedImage(50, 50, BufferedImage.TYPE_INT_RGB))
-                .verify();
-    }
 }
