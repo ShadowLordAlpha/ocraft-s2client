@@ -14,6 +14,8 @@ public enum UnitTypeNames {
     TERRAN_BARRACKS_REACTOR("Barracks Reactor"),
     TERRAN_BARRACKS_TECHLAB("Barracks Tech Lab"),
     TERRAN_BATTLECRUISER("Battlecruiser"),
+
+    TERRAN_CYCLONE("Cyclone"),
     TERRAN_BUNKER("Bunker"),
     TERRAN_COMMAND_CENTER("Command Center"),
     TERRAN_COMMAND_CENTER_FLYING("Flying Command Center"),
@@ -29,7 +31,7 @@ public enum UnitTypeNames {
     TERRAN_HELLION("Hellion"),
     TERRAN_HELLION_TANK("Hellion Tank"),
     TERRAN_LIBERATOR("Liberator"),
-    TERRAN_LIBERATOR_AG("Liberator AG"),
+    TERRAN_LIBERATOR_AG("Liberator"),
     TERRAN_MARAUDER("Marauder"),
     TERRAN_MARINE("Marine"),
     TERRAN_MEDIC("Medic"),
@@ -54,7 +56,7 @@ public enum UnitTypeNames {
     TERRAN_SUPPLY_DEPOT("Supply Depot"),
     TERRAN_SUPPLY_DEPOT_LOWERED("Lowered Supply Depot"),
     TERRAN_THOR("Thor"),
-    TERRAN_THOR_AP("Thor AP"),
+    TERRAN_THOR_AP("Thor"),
     TERRAN_VIKING_ASSAULT("Viking Assault"),
     TERRAN_VIKING_FIGHTER("Viking Fighter"),
     TERRAN_WIDOWMINE("Widow Mine"),
@@ -200,6 +202,9 @@ public enum UnitTypeNames {
     }
 
     public static String getLabelFromName(String name) {
-        return labelMap.get(name);
+        if (labelMap.containsKey(name)) {
+            return labelMap.get(name);
+        }
+        return "unknown";
     }
 }
