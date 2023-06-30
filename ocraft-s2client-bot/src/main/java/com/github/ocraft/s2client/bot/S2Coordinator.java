@@ -675,6 +675,7 @@ public class S2Coordinator {
      * @return False if the game has ended, true otherwise.
      */
     public boolean update() {
+        log.trace("s2Coordinator - update()");
         if (!agents.isEmpty()) {
             if (processSettings.getRealtime()) {
                 stepAgentsRealtime();
@@ -683,10 +684,13 @@ public class S2Coordinator {
             }
         }
 
+        log.trace("s2Coordinator - update() observer start");
         if (!replayObservers.isEmpty()) {
             if (processSettings.getRealtime()) {
+                log.trace("s2Coordinator - update() reailtime");
                 stepReplayObserversRealtime();
             } else {
+                log.trace("s2Coordinator - update() step");
                 stepReplayObservers();
             }
 
@@ -694,6 +698,8 @@ public class S2Coordinator {
                 startReplay();
             }
         }
+        log.trace("s2Coordinator - update() observer done");
+        
         // Check for errors in all agents/replay observers at the end of an update.
         boolean errorOccurred = false;
         for (S2Agent agent : agents) {
