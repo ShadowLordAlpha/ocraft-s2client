@@ -967,6 +967,7 @@ public class S2Coordinator {
                 // If multithreaded run everyone's OnStep in parallel.
                 if (processSettings.getMultithreaded()) {
                     replayObserver.control().issueEvents(Collections.emptyList());
+                    replayObserver.observerAction().sendActions();
                 }
 
                 if (!replayObserver.control().isInGame()) {
