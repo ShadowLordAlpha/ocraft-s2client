@@ -636,6 +636,7 @@ class ControlInterfaceImpl implements ControlInterface {
     public boolean issueEvents(List<Tag> commands) {
         if (!observationInternal().gameLoopChanged()) return false;
 
+        log.trace("Issuing Events");
         issueUnitDestroyedEvents();
         issueUnitAddedEvents();
 
@@ -647,9 +648,11 @@ class ControlInterfaceImpl implements ControlInterface {
         issueUpgradeEvents();
         issueAlertEvents();
 
+        log.trace("Issuing Events - onStep()");
         // Run the users onStep function after events have been issued.
         clientEvents.onStep();
 
+        log.trace("Issuing Events - Done");
         return true;
     }
 
