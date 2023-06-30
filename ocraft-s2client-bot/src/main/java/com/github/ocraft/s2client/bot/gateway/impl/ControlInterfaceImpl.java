@@ -649,7 +649,6 @@ class ControlInterfaceImpl implements ControlInterface {
 
         // Run the users onStep function after events have been issued.
         clientEvents.onStep();
-
         return true;
     }
 
@@ -758,6 +757,7 @@ class ControlInterfaceImpl implements ControlInterface {
 
     @Override
     public void onGameStart() {
+        observationInterface.setPlayerId(1);
         observation()
                 .getUnits(Alliance.SELF, isMainBase())
                 .stream()
