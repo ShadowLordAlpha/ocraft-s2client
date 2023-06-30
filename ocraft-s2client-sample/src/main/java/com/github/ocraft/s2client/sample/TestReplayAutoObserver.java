@@ -23,6 +23,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -46,12 +47,12 @@ public class TestReplayAutoObserver {
 
         private long lastFrame = 0;
 
-        private long startTime = 0;
+        private static long startTime = 0;
 
         private int nbReplay;
 
         // Virtual key code for the desired key
-        int virtualKeyCode = 0x44; // 'D' key
+        static int virtualKeyCode = 0x44; // 'D' key
 
         public SimpleObserver() {
             observer = new CameraModuleObserver(this);
@@ -76,7 +77,8 @@ public class TestReplayAutoObserver {
         public void onGameStart() {
             nbReplay++;
             observer.onStart();
-            startTime = observation().getGameInfo().getNanoTime();
+            startTime = System.nanoTime();
+            control().observation().getGameInfo(true);
             // Find the target window by its title
             WinDef.HWND hwnd = User32.INSTANCE.FindWindow(null, "StarCraft II");
             if (hwnd == null) {
@@ -105,6 +107,7 @@ public class TestReplayAutoObserver {
                 if (file.exists()) {
                     deleted = file.delete();
                 }
+                dataMap = new LinkedHashMap<>();
                 if (deleted) {
                     try (PrintWriter writer = new PrintWriter(file)) {
                         fillMapWithPlayers();
@@ -297,7 +300,7 @@ public class TestReplayAutoObserver {
         }
         S2Coordinator s2Coordinator = S2Coordinator.setup()
                 .loadSettings(args)
-                .setStepSize(4)
+                .setStepSize(1)
                 .setRealtime(true)
                 .setProcessPath(Paths.get("C:\\Program Files (x86)\\StarCraft II\\Versions\\Base75689\\SC2_x64.exe"))
                 .setDataVersion("B89B5D6FA7CBF6452E721311BFBC6CB2")
@@ -309,7 +312,7 @@ public class TestReplayAutoObserver {
         if (s2Coordinator.hasReplays()) {
             long lastStepTime = 0;
             while (s2Coordinator.update() && !s2Coordinator.allGamesEnded()) {
-                if ((System.currentTimeMillis() - lastStepTime) > 40) {
+                if ((System.currentTimeMillis() - lastStepTime) > 30) {
                     lastStepTime = System.currentTimeMillis();
                     observer.control().waitStep(observer.control().step(1));
                 }

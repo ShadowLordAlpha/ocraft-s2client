@@ -850,7 +850,7 @@ public class S2Coordinator {
         replayObserver.replayControl().gatherReplayInfo(replay, true);
 
         // If the replay isn't being pruned based on replay info start it.
-        return replayObserver.ignoreReplay(replayObserver.replayControl().getReplayInfo(), 1);
+        return replayObserver.ignoreReplay(replayObserver.replayControl().getReplayInfo(), 0);
     }
 
     private boolean shouldRelaunch(S2ReplayObserver replayObserver) {
