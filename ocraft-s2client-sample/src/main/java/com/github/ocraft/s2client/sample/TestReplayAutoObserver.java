@@ -23,7 +23,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -48,7 +47,7 @@ public class TestReplayAutoObserver {
         private long lastFrame = 0;
 
         private static long startTime = 0;
-
+        private static boolean productionTabPressed;
         private int nbReplay;
 
         // Virtual key code for the desired key
@@ -76,21 +75,10 @@ public class TestReplayAutoObserver {
         @Override
         public void onGameStart() {
             nbReplay++;
+            productionTabPressed = true;
             observer.onStart();
             startTime = System.nanoTime();
             control().observation().getGameInfo(true);
-            // Find the target window by its title
-            WinDef.HWND hwnd = User32.INSTANCE.FindWindow(null, "StarCraft II");
-            if (hwnd == null) {
-                System.out.println("Window not found");
-                return;
-            }
-
-            // Set the target window as the foreground window
-            User32.INSTANCE.SetForegroundWindow(hwnd);
-
-            // Simulate key press
-            pressKey(virtualKeyCode);
         }
 
         @Override
@@ -100,8 +88,22 @@ public class TestReplayAutoObserver {
 
         @Override
         public void onStep() {
-            control().getObservation();
-            if ((System.currentTimeMillis() - lastFrame) > 2000) {
+            if (3_000_000_000L < (System.nanoTime() - startTime)  && (System.nanoTime() - startTime) < 4_000_000_000L && !productionTabPressed) {
+                // Find the target window by its title
+                WinDef.HWND hwnd = User32.INSTANCE.FindWindow(null, "StarCraft II");
+                if (hwnd == null) {
+                    System.out.println("Window not found");
+                    return;
+                }
+
+                // Set the target window as the foreground window
+                User32.INSTANCE.SetForegroundWindow(hwnd);
+
+                // Simulate key press
+                pressKey(virtualKeyCode);
+                productionTabPressed = true;
+            }
+            if ((System.currentTimeMillis() - lastFrame) > 2500) {
                 boolean deleted = false;
                 File file = new File("D:\\Workspace\\python\\commentary-sc2\\data\\game_info.txt");
                 if (file.exists()) {
@@ -126,7 +128,7 @@ public class TestReplayAutoObserver {
                 observer.onFrame();
             }
             try {
-                Thread.sleep(5);
+                Thread.sleep(1);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -134,7 +136,7 @@ public class TestReplayAutoObserver {
 
         private void fillMapWithPlayers() {
             String replayFileName = replay_map.get(nbReplay);
-            dataMap.put("ingame_time_in_minutes", (System.nanoTime() - startTime) / 1_000_000_000 / 60);
+            dataMap.put("ingame_time_in_minutes", ((System.nanoTime() - startTime) / 1_000_000_000 / 60) + 1);
             if (replayFileName != null) {
                 Pattern pattern = Pattern.compile("\\d+_(.*?)_(.*?)_(.*?)\\.");
                 Matcher matcher = pattern.matcher(replayFileName);
@@ -320,7 +322,7 @@ public class TestReplayAutoObserver {
         }
         S2Coordinator s2Coordinator = S2Coordinator.setup()
                 .loadSettings(args)
-                .setStepSize(1)
+                .setStepSize(4)
                 .setRealtime(true)
                 .setProcessPath(Paths.get("C:\\Program Files (x86)\\StarCraft II\\Versions\\Base75689\\SC2_x64.exe"))
                 .setDataVersion("B89B5D6FA7CBF6452E721311BFBC6CB2")
@@ -332,7 +334,7 @@ public class TestReplayAutoObserver {
         if (s2Coordinator.hasReplays()) {
             long lastStepTime = 0;
             while (s2Coordinator.update() && !s2Coordinator.allGamesEnded()) {
-                if ((System.currentTimeMillis() - lastStepTime) > 30) {
+                if ((System.currentTimeMillis() - lastStepTime) > 35) {
                     lastStepTime = System.currentTimeMillis();
                     observer.control().waitStep(observer.control().step(1));
                 }
