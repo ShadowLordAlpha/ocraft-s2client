@@ -42,7 +42,7 @@ public class CameraModuleObserver extends CameraModule {
 
     @Override
     protected void updateCameraPositionExcecute() {
-        if(followUnit) {
+        if (followUnit) {
             //log.info("Moving Camera to Unit");
 
             // Annoyingly this doesn't appear to work.... the other one does though for some reason
