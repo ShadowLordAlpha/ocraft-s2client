@@ -964,10 +964,10 @@ public class S2Coordinator {
 
             if (replayObserver.control().isInGame()) {
                 replayObserver.control().getObservation();
+
                 // If multithreaded run everyone's OnStep in parallel.
                 if (processSettings.getMultithreaded()) {
                     replayObserver.control().issueEvents(Collections.emptyList());
-                    replayObserver.observerAction().sendActions();
                 }
 
                 if (!replayObserver.control().isInGame()) {
@@ -1119,7 +1119,7 @@ public class S2Coordinator {
         return processSettings;
     }
 
-    public ReplaySettings getReplaySettings() {
+    ReplaySettings getReplaySettings() {
         return replaySettings;
     }
 

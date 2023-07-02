@@ -2,6 +2,7 @@ package com.github.ocraft.s2client.bot.camera;
 import SC2APIProtocol.Sc2Api;
 import com.github.ocraft.s2client.bot.S2ReplayObserver;
 import com.github.ocraft.s2client.protocol.request.Requests;
+import com.github.ocraft.s2client.protocol.spatial.Point2d;
 import com.github.ocraft.s2client.protocol.spatial.PointI;
 
 public class CameraModuleObserver extends CameraModule {
@@ -30,7 +31,7 @@ public class CameraModuleObserver extends CameraModule {
         player_perspective->set_player_id(0);  // 0 = everyone
         m_client->Control()->Proto().SendRequest(request);
         m_client->Control()->WaitForResponse();*/
-
+        m_client.control().observerAction().cameraSetPerspective(0);
         super.onStart();
     }
 
@@ -41,6 +42,17 @@ public class CameraModuleObserver extends CameraModule {
 
     @Override
     protected void updateCameraPositionExcecute() {
-        m_client.control().observerAction().cameraMove(PointI.of((int) currentCameraPosition.getX(), (int) currentCameraPosition.getY()), cameraDistance);
+        if(followUnit) {
+            //log.info("Moving Camera to Unit");
+
+            // Annoyingly this doesn't appear to work.... the other one does though for some reason
+            // m_client().control().observerAction().cameraFollowUnits(cameraFocusUnit.unit());
+
+            m_client.control().observerAction().cameraMove(cameraFocusUnit.unit().getPosition().toPoint2d(), cameraDistance);
+        } else {
+            //log.info("Moving Camera to Position {} {}", cameraFocusPosition.getX(), cameraFocusPosition.getY());
+
+            m_client.control().observerAction().cameraMove(Point2d.of(cameraFocusPosition.getX(), cameraFocusPosition.getY()), cameraDistance);
+        }
     }
 }

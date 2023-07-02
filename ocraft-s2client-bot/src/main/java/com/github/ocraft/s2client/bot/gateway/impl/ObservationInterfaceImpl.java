@@ -528,7 +528,7 @@ class ObservationInterfaceImpl implements ObservationInterface {
 
         observation = responseObservation.getObservation();
         previousGameLoop = currentGameLoop;
-        currentGameLoop++;
+        currentGameLoop = responseObservation.getObservation().getGameLoop();
         playerId = observation.getPlayerCommon().getPlayerId();
 
         if (gameLoopChanged()) {
