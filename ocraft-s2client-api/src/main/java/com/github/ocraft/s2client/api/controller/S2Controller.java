@@ -119,6 +119,11 @@ public class S2Controller extends DefaultSubscriber<Response> {
             return this;
         }
 
+        public Builder withWindowMode(Integer d) {
+            if (isSet(d)) builderConfig.put(GAME_WINDOW_MODE, d);
+            return this;
+        }
+
         public Builder withWindowPosition(Integer x, Integer y) {
             if (isSet(x)) builderConfig.put(GAME_WINDOW_X, x);
             if (isSet(y)) builderConfig.put(GAME_WINDOW_Y, y);
