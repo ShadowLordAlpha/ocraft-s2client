@@ -221,7 +221,8 @@ public class S2Controller extends DefaultSubscriber<Response> {
             args.add(exeFile);
             command(args, "-listen", GAME_NET_IP);
             command(args, "-port", GAME_NET_PORT);
-            command(args, "-displayMode", GAME_WINDOW_MODE);
+            // command(args, "-displayMode", GAME_WINDOW_MODE);
+            command(args, "-displayMode", "1");
             command(args, "-dataVersion", GAME_EXE_DATA_VER);
             command(args, "-windowwidth", GAME_WINDOW_W);
             command(args, "-windowheight", GAME_WINDOW_H);
