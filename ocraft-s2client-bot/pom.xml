@@ -3,7 +3,7 @@
     <parent>
         <artifactId>ocraft-s2client</artifactId>
         <groupId>com.github.ocraft</groupId>
-        <version>0.4.15-SNAPSHOT</version>
+        <version>0.4.16-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -69,6 +69,12 @@
         <dependency>
             <groupId>nl.jqno.equalsverifier</groupId>
             <artifactId>equalsverifier</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>RELEASE</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 
