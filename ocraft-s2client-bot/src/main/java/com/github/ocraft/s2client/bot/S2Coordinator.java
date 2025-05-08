@@ -34,6 +34,7 @@ import com.github.ocraft.s2client.bot.gateway.ControlInterface;
 import com.github.ocraft.s2client.bot.setting.*;
 import com.github.ocraft.s2client.bot.syntax.SettingsSyntax;
 import com.github.ocraft.s2client.bot.syntax.StartGameSyntax;
+import com.github.ocraft.s2client.protocol.action.ObserverAction;
 import com.github.ocraft.s2client.protocol.game.*;
 import com.github.ocraft.s2client.protocol.response.Response;
 import com.github.ocraft.s2client.protocol.response.ResponseType;
@@ -74,6 +75,8 @@ public class S2Coordinator {
     private final ProcessSettings processSettings;
     private final ReplaySettings replaySettings;
     private final GameSettings gameSettings;
+
+    private long lastStepTime = 0;
 
     private final boolean useGeneralizedAbilityId;
 
@@ -847,7 +850,7 @@ public class S2Coordinator {
         replayObserver.replayControl().gatherReplayInfo(replay, true);
 
         // If the replay isn't being pruned based on replay info start it.
-        return replayObserver.ignoreReplay(replayObserver.replayControl().getReplayInfo(), 1);
+        return replayObserver.ignoreReplay(replayObserver.replayControl().getReplayInfo(), 0);
     }
 
     private boolean shouldRelaunch(S2ReplayObserver replayObserver) {
@@ -929,7 +932,7 @@ public class S2Coordinator {
     private void stepReplayObserversRealtime() {
         // Run all replay observers.
         if (replayObservers.size() == 1) {
-            runReplayRealtime().accept(replayObservers.get(0));
+            replayObservers.forEach(runReplayRealtime());
         } else {
             // Run all steps in parallel.
             replayObservers.parallelStream().forEach(runReplayRealtime());
@@ -938,7 +941,10 @@ public class S2Coordinator {
         if (!processSettings.getMultithreaded()) {
             replayObservers.stream()
                     .filter(replayObserver -> replayObserver.control().getAppState().equals(AppState.NORMAL))
-                    .forEach(replayObserver -> replayObserver.control().issueEvents(Collections.emptyList()));
+                    .forEach(replayObserver -> {
+                        replayObserver.control().issueEvents(Collections.emptyList());
+                        replayObserver.observerAction().sendActions();
+                    });
         }
     }
 
